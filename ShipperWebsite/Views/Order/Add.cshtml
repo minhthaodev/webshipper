@@ -1,0 +1,255 @@
+﻿@model ShipperWebsite.ViewModel.OrderViewModel
+
+@{
+    ViewBag.Title = "Add";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var users = (List<User>)ViewBag.Users;
+}
+
+
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="button-action m-b-10">
+                    <a href="@Url.Action("Index","Order")" class="btn btn-warning btn-fill">Trở về</a>
+                </div>
+                @using (Html.BeginForm("Add", "Order", FormMethod.Post))
+                {
+                <div class="row">
+                    <div class="col-md-9">
+                        <div class="card">
+                            <div class="header">
+                                <h4 class="title">Thêm mới đơn hàng</h4>
+                            </div>
+                            <div class="content">
+                                
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading">Người gửi</div>
+                                        <div class="panel-body">
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <label>Họ tên</label>
+                                                       @* @Html.TextBoxFor(m => m.SenderFullName, new { @class = "form-control" })*@
+                                                        <input placeholder="Họ tên chỉ được nhập chữ !" type="text" id="SenderFullName" name="SenderFullName" 
+                                                               class="form-control input-sm field" required requiredmsg="Vui lòng không để Trống" 
+                                                               maxlength="50" title="Họ tên chỉ được nhập chữ ! " />
+                                                        @Html.ValidationMessageFor(m=>m.SenderFullName)
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-8">
+                                                    <div class="form-group">
+                                                        <label>Địa chỉ</label>
+                                                       @* @Html.TextBoxFor(m => m.SenderAddress, new { @class = "form-control", placeHolder="Địa chỉ nhận" }) *@
+                                                        <input placeholder="Địa chỉ nhận" type="text" id="SenderAddress" name="SenderAddress" 
+                                                               class="form-control input-sm field" required requiredmsg="Vui lòng không để Trống" />
+                                                        @Html.HiddenFor(m => m.SenderLatLng.Lat, new { data_val = "false"})
+                                                        @Html.HiddenFor(m => m.SenderLatLng.Lng, new { data_val = "false" })
+                                                        @Html.ValidationMessageFor(m => m.SenderAddress)
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <label>Số điện thoại</label>
+                                                        @* @Html.TextBoxFor(m => m.SenderPhone, new { @class = "form-control" }) *@
+                                                        <input placeholder="Điện Thoại" type="tel" id="SenderPhone" name="SenderPhone"
+                                                               class="form-control input-sm field" maxlength="13" required requiredmsg="Vui lòng không để Trống"
+                                                               pattern="[0-9]{10,13}" title="Vui lòng nhập số điện thoại đúng định dạng 10-13 số !" />
+                                                        @Html.ValidationMessageFor(m => m.SenderPhone)
+
+                                                       
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading">Người nhận</div>
+                                        <div class="panel-body">
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <label>Họ tên</label>
+                                                     @*   @Html.TextBoxFor(m => m.ReceiveFullName, new { @class = "form-control" })*@
+                                                        <input placeholder="Họ tên chỉ được nhập chữ !" type="text" id="ReceiveFullName" name="ReceiveFullName"
+                                                               class="form-control input-sm field" required requiredmsg="Vui lòng không để Trống"
+                                                               maxlength="50" title="Họ tên chỉ được nhập chữ ! " />
+                                                        @Html.ValidationMessageFor(m => m.ReceiveFullName)
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-8">
+                                                    <div class="form-group">
+                                                        <label>Địa chỉ</label>
+                                                      @*  @Html.TextBoxFor(m => m.ReceiveAddress, new { @class = "form-control", placeHolder = "Địa chỉ giao" })*@
+                                                        <input placeholder="Địa chỉ giao" type="text" id="ReceiveAddress" name="ReceiveAddress"
+                                                               class="form-control input-sm field" required requiredmsg="Vui lòng không để Trống" />
+                                                        @Html.HiddenFor(m => m.ReceiveLatLng.Lat, new { data_val = "false" })
+                                                        @Html.HiddenFor(m => m.ReceiveLatLng.Lng, new { data_val = "false" })
+                                                        @Html.ValidationMessageFor(m => m.ReceiveAddress)
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <label>Số điện thoại</label>
+                                                      @*  @Html.TextBoxFor(m => m.ReceivePhone, new { @class = "form-control" })*@
+                                                        <input placeholder="Điện Thoại" type="tel" id="ReceivePhone" name="ReceivePhone"
+                                                               class="form-control input-sm field" maxlength="13" required requiredmsg="Vui lòng không để Trống"
+                                                               pattern="[0-9]{10,13}" title="Vui lòng nhập số điện thoại đúng định dạng 10-13 số !" />
+                                                        @Html.ValidationMessageFor(m => m.ReceivePhone)
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-info btn-fill pull-right">Thêm</button>
+                                    <div class="clearfix"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card">
+                            <div class="header">
+                                <h4 class="title">Thông tin</h4>
+                            </div>
+                            <div class="content">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label>Tổng tiền</label>
+                                     @*       @Html.TextBoxFor(m => m.TotalPrice, new { @class = "form-control" })*@
+                                            <input placeholder="Tổng tiền" type="number" id="TotalPrice" name="TotalPrice"
+                                                   class="form-control input-sm field" maxlength="20" required requiredmsg="Vui lòng không để Trống"
+                                                   pattern="[0-9]{4,20}" title="Vui lòng nhập giá tiền đúng quy định" />
+                                            @Html.ValidationMessageFor(m => m.TotalPrice)
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label>Nhân viên</label>
+                                            @Html.DropDownListFor(m => m.UserID, users.Select(u => new SelectListItem()
+                                               {
+                                                   Text = u.Name,
+                                                   Value = u.UserID
+                                               }
+                                            ).ToList(), "Chọn nhân viên", new { @class = "form-control"})
+                                            
+                                            @Html.ValidationMessageFor(m => m.UserID)
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                    </div>
+                </div>
+            </div>
+                }
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script src="https://maps.googleapis.com/maps/api/js?key=@Config.GOOGLE_MAP_API&libraries=places&callback=initAutocomplete" async defer></script>
+
+    <script>
+        var inputSenderAddress = document.getElementById('SenderAddress');
+        var inputReceiverAddress = document.getElementById('ReceiveAddress');
+        var senderAutocomplete, receiveAutocomplete;
+        var options = {
+            componentRestrictions: { country: 'VN' },
+            types: ['geocode']
+        };
+        function initAutocomplete() {
+            // Create the autocomplete object, restricting the search to geographical
+            // location types.
+            initSenderAutocomplete();
+            initReceiveAutocomplete();
+        }
+
+        function initSenderAutocomplete() {
+            senderAutocomplete = new google.maps.places.Autocomplete(
+                inputSenderAddress, options);
+            var location_being_changed;
+            google.maps.event.addListener(senderAutocomplete, 'place_changed', function () {
+                //FIRE SEARCH
+                $('#SenderLatLng_Lat').val('');
+                var place = senderAutocomplete.getPlace();
+                if (!place.geometry) {
+                    alert("Không tìm thấy địa chỉ");
+                    return;
+                }
+                location_being_changed = false;
+                $('#SenderLatLng_Lat').val(place.geometry.location.lat());
+                $('#SenderLatLng_Lng').val(place.geometry.location.lng());
+            });
+            google.maps.event.addDomListener(inputSenderAddress, 'keydown', function (e) {
+                if (e.keyCode === 13) {
+                    if (location_being_changed) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                } else {
+                    // means the user is probably typing
+                    location_being_changed = true;
+                    $('#SenderLatLng_Lat').val('');
+                    $('#SenderLatLng_Lng').val('');
+                }
+            });
+        }
+
+        function initReceiveAutocomplete() {
+            receiveAutocomplete = new google.maps.places.Autocomplete(
+                inputReceiverAddress, options);
+            var location_being_changed;
+            google.maps.event.addListener(receiveAutocomplete, 'place_changed', function () {
+                //FIRE SEARCH
+                $('#ReceiveLatLng_Lat').val('');
+                var place = receiveAutocomplete.getPlace();
+                if (!place.geometry) {
+                    alert("Không tìm thấy địa chỉ");
+                    return;
+                }
+                location_being_changed = false;
+                $('#ReceiveLatLng_Lat').val(place.geometry.location.lat());
+                $('#ReceiveLatLng_Lng').val(place.geometry.location.lng());
+            });
+            google.maps.event.addDomListener(inputReceiverAddress, 'keydown', function (e) {
+                if (e.keyCode === 13) {
+                    if (location_being_changed) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                } else {
+                    // means the user is probably typing
+                    location_being_changed = true;
+                    $('#ReceiveLatLng_Lat').val('');
+                    $('#ReceiveLatLng_Lng').val('');
+                }
+            });
+        }
+
+    </script>
+    <script >
+    $(document).ready(function () {
+        var elements = $("input, select");
+        for (var i = 0; i < elements.length; i++) {
+            elements[i].oninvalid = function (e) {
+                e.target.setCustomValidity("");
+                if (!e.target.validity.valid) {
+                    e.target.setCustomValidity(e.target.getAttribute("requiredmsg"));
+                }
+            };
+            elements[i].oninput = function (e) {
+                e.target.setCustomValidity("");
+            };
+        }
+     
+    })
+    </script>   
+}

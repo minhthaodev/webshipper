@@ -1,0 +1,258 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script src="https://www.gstatic.com/firebasejs/3.5.2/firebase.js"></script>
+<div class="map-container">
+    <div class="nv-main-box">
+        <div class="panel-group" id="panel-quote-group">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <strong>Nhân viên</strong>
+                        <span class="pull-right">
+                            <a data-toggle="collapse" data-parent="#panel-quote-group" href="#collapseQuote">
+                                <span class="toggle-icon pe-7s-angle-up-circle"></span>
+                            </a>
+                        </span>
+                    </h4>
+                </div>
+                <div id="collapseQuote" class="panel-collapse collapse">
+                    <ul class="list-group scrollbar">
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="map"></div>
+</div>
+
+
+@section scripts{
+    <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=@Config.GOOGLE_MAP_API&callback=initialize">
+    </script>
+    <script>
+    var map;
+    var marker;
+    var markers = {};
+    var pos;
+    var onlineStatus = '<label class="label label-success">Online</label>';
+    var offlineStatus = '<label class="label label-danger">Offline</label>';
+    function initialize() {
+        var uluru = { lat: 10.823640700000015, lng: 106.70425539999997 };
+        map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 17,
+            center: uluru
+        });
+    }
+    var icons = {
+        deliver: {
+            icon: '/Content/img/motorbike.png'
+        },
+        free: {
+            icon: '/Content/img/motorbike-free.png'
+        },
+        stop: {
+            icon: '/Content/img/stop.png'
+        }
+    }
+    // Initialize Firebase
+     //TODO: Replace with your project's customized code snippet
+        var config = {
+            apiKey: "AIzaSyBcUBCQhNB0jCiOdaihKZaXBqkaAw54ruY",
+            authDomain: "shipperv2.firebaseapp.com",
+            databaseURL: "https://shipperv2.firebaseio.com",
+            projectId: "shipperv2",
+            storageBucket: "shipperv2.appspot.com",
+    };
+    firebase.initializeApp(config);
+    //// Get a reference to the database service
+    var database = firebase.database();
+
+    var locationRef = database.ref('shipper_location');
+    var first = true;
+
+    
+    
+    database.ref('users').once('value', function (snapshot) {
+        $('#collapseQuote .list-group').html("");
+        snapshot.forEach(function (childSnapshot) {
+            
+                var id = childSnapshot.key;
+                addToListStaff(id);
+
+            
+                
+        });
+        });
+    
+    //Khởi tạo các marker
+    database.ref('shipper_location').once('value', function (snapshot) {
+        snapshot.forEach(function (childSnapshot) {
+            var id = childSnapshot.key;
+            var record = childSnapshot.val();
+            var pos = new google.maps.LatLng(record.lat, record.lng);
+            var now = new Date().getTime();
+            var duration = now - parseInt(record.lastTime);
+            addMarker(id, pos);
+        });
+    });
+
+    //Lắng nghe hành động di chuyển
+    database.ref('shipper_location').on('child_changed', function (snapshot) {
+        var id = snapshot.key;
+        var record = snapshot.val();
+        var marker = markers[id];
+        var pos = new google.maps.LatLng(record.lat, record.lng);
+
+        if (snapshot.hasChild('orders')) {
+            marker.setIcon(icons.deliver.icon);
+        } else {
+            marker.setIcon(icons.free.icon);
+        }
+
+        marker.setPosition(pos);
+    });
+
+    //Lắng nghe sự kiện trạng thái nhân viên
+    database.ref('presences').on('child_changed', function (snapshot) {
+        var result = snapshot.val();
+        var id = snapshot.key;
+
+        if(result.status == 'offline'){
+            setMarkerIcon(id, icons.stop.icon);
+        } else {
+            database.ref('shipper_location').child(id).once('value', function (snapshot) {
+                var record = snapshot.val();
+                var id = snapshot.key;
+                if (snapshot.hasChild('orders')) {
+                    setMarkerIcon(id, icons.deliver.icon);
+                } else {
+                    setMarkerIcon(id, icons.free.icon);
+                }
+            });
+        }
+    });
+
+    function jumpTo(lat, lng) {
+        var latlng = new google.maps.LatLng(lat, lng);
+        map.panTo(latlng);
+    }
+
+    $('a[data-toggle="collapse"]').click(function () {
+        $(this).find('span.toggle-icon').toggleClass('pe-7s-angle-up-circle pe-7s-angle-down-circle');
+    })
+
+    $(document).on('click', function (event) {
+        var container = $(".nv-main-box");
+        if (!container.is(event.target) &&            // If the target of the click isn't the container...
+            container.has(event.target).length === 0) // ... nor a descendant of the container
+        {
+            $('#collapseQuote').collapse("hide");
+        }
+    });
+
+    $(document).on('click', '#collapseQuote .list-group li', function () {
+        var id = $(this).data('id');
+        database.ref('shipper_location').child(id).once('value', function (snapshot) {
+            var result = snapshot.val();
+            jumpTo(result.lat, result.lng);
+            $('#collapseQuote').collapse("hide");
+        });
+    });
+
+    // Deletes all markers in the array by removing references to them
+    function deleteOverlays() {
+        if (markers) {
+            for (i in markers) {
+                markers[i].setMap(null);
+            }
+            markers.length = 0;
+        }
+    }
+    // Shows any overlays currently in the array
+    function showOverlays() {
+        if (markers) {
+            for (i in markers) {
+                markers[i].setMap(map);
+            }
+        }
+    }
+
+    function addToListStaff(id) {
+        database.ref('users').child(id).once('value', function (snapshot)
+        {
+          
+            var info = snapshot.val();
+            var item = '<li data-id=' + id + ' class=\"list-group-item\">\n<div class=\"pull-left\" style=\"margin-right:10px;\"> \n<a href=\"#\">\n<img src=\"https:\/\/s3.amazonaws.com\/uifaces\/faces\/twitter\/fffabs\/128.jpg\" class=\"media-photo\">\n<\/a>\n<\/div>\n<div class=\"list-body\">\n<h4 class=\"title\">\n' + info.name + '<div class="pull-right user-status">' + offlineStatus + '</div>\n<\/h4>\n<p class=\"summary\">' + info.phone + '<\/p>\n <p class=\"summary\">' + info.address + '<\/p>\n <\/div>\n<\/li>';
+            $('#collapseQuote .list-group').append(item);
+            database.ref('presences').child(id).on('value', function (snapshot) {
+                var id = snapshot.key;
+                var userViewStatus = $('#collapseQuote .list-group li[data-id=' + id + ']').find('.user-status');
+                var record = snapshot.val();
+                if (record == null) {
+                    userViewStatus.html(offlineStatus);
+                    //markers[id].setMap(null);
+                } else {
+                    if (record.status == 'online') {
+                        userViewStatus.html(onlineStatus);
+                        //markers[id].setMap(map);
+                    } else {
+                        userViewStatus.html(offlineStatus);
+                        //markers[id].setMap(null);
+                    }
+                }
+            });
+        });
+    }
+
+    function setMarkerIcon(id, icon) {
+        var marker = markers[id];
+        if(marker != null){
+            marker.setIcon(icon);
+        }
+    }
+
+    function addMarker(id, pos) {
+        var marker = new google.maps.Marker({
+            position: pos,
+            map: map
+        });
+        database.ref('presences').child(id).once('value', function (snapshot) {
+            var result = snapshot.val();
+            if(result.status == 'offline'){
+                marker.setIcon(icons.stop.icon);
+            } else {
+                database.ref('shipper_location').child(id).once('value', function (snapshot) {
+                    var result = snapshot.val();
+                    if (snapshot.hasChild('orders')) {
+                        marker.setIcon(icons.deliver.icon);
+                    } else {
+                        marker.setIcon(icons.free.icon);
+                    }
+                });
+            }
+        });
+        var infowindow = new google.maps.InfoWindow({
+            content: "Đang tải..."
+        });
+        google.maps.event.addListener(infowindow, 'domready', function () {
+            console.log(1);
+        });
+        marker.addListener('click', function () {
+            infowindow.open(map, this);
+            database.ref('users').child(id).once('value', function (snapshot) {
+                var info = snapshot.val();
+                infowindow.setContent(
+                    '<p>Họ tên: ' + info.name + '</p>' +
+                    '<p>SĐT: ' + info.phone + '</p>'
+                );
+            });
+        });
+        markers[id] = marker;
+    }
+</script>
+}

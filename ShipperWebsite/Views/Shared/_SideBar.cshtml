@@ -1,0 +1,50 @@
+﻿<div class="sidebar" data-color="blue" data-image="~/Content/img/sidebar-5.jpg">
+    <!--
+
+        Tip 1: you can change the color of the sidebar using: data-color="blue | azure | green | orange | red | purple"
+        Tip 2: you can also add an image using data-image tag
+
+    -->
+    <div class="sidebar-wrapper">
+        <div class="logo">
+            <a href="@Url.Action("Index","Home")" class="simple-text">
+                ShipperManager
+            </a>
+        </div>
+        <ul class="nav">
+            <li class="@Html.IsActive("Index","Home")">
+                <a href="@Url.Action("Index","Home")">
+                    <i class="pe-7s-graph"></i>
+                    <p>Dashboard</p>
+                </a>
+            </li>
+            <li class="@Html.IsActive("Index","Order")">
+                <a href="@Url.Action("Index","Order")">
+                    <i class="pe-7s-news-paper"></i>
+                    <p>Đơn hàng</p>
+                </a>
+            </li>
+            <li class="@Html.IsActive("Index","Staff")">
+                <a href="@Url.Action("Index","Staff")">
+                    <i class="pe-7s-user"></i>
+                    <p>Nhân viên</p>
+                </a>
+            </li>
+
+            <li class="@Html.IsActive("Index","StaffCustomer")">
+                <a href="@Url.Action("Index","StaffCustomer")">
+                    <i class="pe-7s-user"></i>
+                    <p>Khách hàng</p>
+                </a>
+            </li>
+
+            <li class="@Html.IsActive("Index","Map")">
+                <a href="@Url.Action("Index","Map")">
+                    <i class="pe-7s-map-marker"></i>
+                    <p>Bản đồ</p>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="sidebar-background" style="background-image: url(/Content/img/sidebar-5.jpg); display: block;"></div>
+</div>

@@ -1,0 +1,64 @@
+﻿@model List<User>
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="header">
+                        <h4 class="title">Danh sách khách hàng</h4>
+                        <p class="category">Hiển thị danh sách khách hàng đã đăng ký</p>
+                    </div>
+                    <div class="content table-responsive table-full-width">
+                        <table class="table table-hover table-striped">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Hình ảnh</th>
+                                    <th>Họ tên</th>
+                                    <th>Điện thoại</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{int i = 0;}
+                                @foreach (var user in Model)
+                                {
+                                    i++;
+
+                                    <tr>
+                                        @{
+                                            if (user.Permission.Equals("False"))
+                                            {
+                                                <td>@i</td>
+                                                <td>
+                                                    @{
+                                                        var path = "/Content/img/default-avatar.png";
+                                                        if (!String.IsNullOrEmpty(user.Url))
+                                                        {
+                                                            path = user.Url;
+                                                        }
+                                                    }
+                                                    <img src="@path" width="100px" height="100px" />
+                                                </td>
+                                                <td>@user.Name</td>
+                                                <td>@user.Phone</td>
+                                                <td>
+                                                    <a href="@Url.Action("Edit", "StaffCustomer", new { id = user.UserID })" class="btn btn-warning btn-fill btn-sm m-l-5">Sửa</a>
+
+                                                </td>
+                                            }
+                                        }
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
